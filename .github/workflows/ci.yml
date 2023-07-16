@@ -1,14 +1,31 @@
 name: Continuous Integration
 
 on:
-  push:
-    branches-ignore: [main]
   pull_request:
     branches: [main]
 
 jobs:
-  lint-and-build:
-    name: Lint and build
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Build project
+        run: dotnet build --no-restore
+
+  lint:
+    name: Code style
     runs-on: ubuntu-latest
 
     permissions:
@@ -28,14 +45,3 @@ jobs:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 7.0.x
-
-      - name: Install dependencies
-        run: dotnet restore
-
-      - name: Build project
-        run: dotnet build --no-restore
