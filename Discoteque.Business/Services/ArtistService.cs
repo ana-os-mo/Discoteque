@@ -1,67 +1,39 @@
 namespace Discoteque.Business.Services;
 
 using Discoteque.Business.IServices;
+using Discoteque.Data;
 using Discoteque.Data.Models;
 
 public class ArtistService : IArtistService
 {
-  public Task<Artist> CreateArtist(Artist artist)
+  private IUnitOfWork _unitOfWork;
+
+  public ArtistService(IUnitOfWork unitOfWork)
   {
-    throw new NotImplementedException();
+    _unitOfWork = unitOfWork;
   }
 
-  public Task<Artist> GetArtistById(int id)
+  public async Task<Artist> CreateArtist(Artist artist)
   {
-    throw new NotImplementedException();
+    await _unitOfWork.ArtistRepository.AddAsync(artist);
+    await _unitOfWork.SaveAsync();
+    return artist;
   }
 
-  public async Task<IEnumerable<Artist>> GetArtists()
+  public async Task<Artist> GetArtistById(int id)
   {
-    // Temporary: remove when using the database
-    await Task.CompletedTask;
-
-    return new List<Artist>
-    {
-      new()
-      {
-        Id = 1,
-        Name = "Interpol",
-        Label = "Matador Records",
-        IsOnTour = true
-      },
-      new()
-      {
-        Id = 2,
-        Name = "Arctic Monkeys",
-        Label = "Domino Recording Company",
-        IsOnTour = true
-      },
-      new()
-      {
-        Id = 3,
-        Name = "Lana Del Rey",
-        Label = "Interscope Records",
-        IsOnTour = false
-      },
-      new()
-      {
-        Id = 4,
-        Name = "Tame Impala",
-        Label = "Interscope Records",
-        IsOnTour = true
-      },
-      new()
-      {
-        Id = 5,
-        Name = "Radiohead",
-        Label = "XL Recordings",
-        IsOnTour = false
-      }
-    };
+    return await _unitOfWork.ArtistRepository.FindAsync(id);
   }
 
-  public Task<Artist> UpdateArtist(Artist artist)
+  public async Task<IEnumerable<Artist>> GetArtistsAsync()
   {
-    throw new NotImplementedException();
+    return await _unitOfWork.ArtistRepository.GetAllAsync();
+  }
+
+  public async Task<Artist> UpdateArtist(Artist artist)
+  {
+    await _unitOfWork.ArtistRepository.Update(artist);
+    await _unitOfWork.SaveAsync();
+    return artist;
   }
 }
